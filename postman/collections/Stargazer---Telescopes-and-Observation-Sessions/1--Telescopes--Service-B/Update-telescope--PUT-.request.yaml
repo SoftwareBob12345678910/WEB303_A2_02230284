@@ -1,0 +1,22 @@
+$kind: http-request
+name: 'Update telescope (PUT)'
+order: 4000
+method: PUT
+url: '{{baseUrl}}/telescopes/{{telescopeId}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Dobsonian 8 (collimated)",
+      "aperture_mm": 203,
+      "type": "REFLECTOR",
+      "status": "AVAILABLE"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () { pm.response.to.have.status(200); });

@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'List sessions while Service B is down -> 200 FALLBACK'
+order: 3000
+method: GET
+url: '{{baseUrl}}/sessions'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () { pm.response.to.have.status(200); });

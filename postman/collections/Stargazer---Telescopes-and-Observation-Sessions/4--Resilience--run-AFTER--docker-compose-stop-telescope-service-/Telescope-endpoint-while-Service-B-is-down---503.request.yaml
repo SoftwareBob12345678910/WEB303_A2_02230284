@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'Telescope endpoint while Service B is down -> 503'
+order: 4000
+method: GET
+url: '{{baseUrl}}/telescopes'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 503", function () { pm.response.to.have.status(503); });

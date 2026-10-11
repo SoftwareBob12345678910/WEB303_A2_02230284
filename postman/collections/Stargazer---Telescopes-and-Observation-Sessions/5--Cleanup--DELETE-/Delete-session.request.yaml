@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'Delete session'
+order: 1000
+method: DELETE
+url: '{{baseUrl}}/sessions/{{sessionId}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 204", function () { pm.response.to.have.status(204); });

@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Session for unknown telescope -> 404'
+order: 10000
+method: POST
+url: '{{baseUrl}}/sessions'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "telescope_id": "11111111-1111-4111-8111-111111111111",
+      "observer": "Asha",
+      "date": "{{sessionDate}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 404", function () { pm.response.to.have.status(404); });

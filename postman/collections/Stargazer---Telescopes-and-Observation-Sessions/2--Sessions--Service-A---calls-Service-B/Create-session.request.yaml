@@ -1,0 +1,23 @@
+$kind: http-request
+name: 'Create session'
+order: 1000
+method: POST
+url: '{{baseUrl}}/sessions'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "telescope_id": "{{telescopeId}}",
+      "observer": "Asha",
+      "date": "{{sessionDate}}",
+      "target": "Saturn"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function () { pm.response.to.have.status(201); });
+      pm.collectionVariables.set("sessionId", pm.response.json().id);

@@ -1,0 +1,3 @@
+$kind: collection
+name: '2. Sessions (Service A -> calls Service B)'
+order: 2000

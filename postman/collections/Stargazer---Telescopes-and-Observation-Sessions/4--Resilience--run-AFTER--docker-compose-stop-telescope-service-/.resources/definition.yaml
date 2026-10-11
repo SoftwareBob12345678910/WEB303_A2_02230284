@@ -1,0 +1,3 @@
+$kind: collection
+name: '4. Resilience (run AFTER: docker compose stop telescope-service)'
+order: 4000

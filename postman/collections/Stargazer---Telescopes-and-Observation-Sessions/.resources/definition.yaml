@@ -1,0 +1,18 @@
+$kind: collection
+name: Stargazer - Telescopes & Observation Sessions
+description: Run folders 1,2,3 in order with the full stack up. Run folder 4 after `docker compose stop telescope-service`, then `docker compose start telescope-service` and run 5. All requests go through the API gateway only.
+variables:
+  baseUrl: http://localhost:8080
+  telescopeId: ""
+  maintenanceId: ""
+  sessionId: ""
+  sessionDate: ""
+  sessionDate2: ""
+scripts:
+  - type: http:beforeRequest
+    code: |-
+      // Pick bookable dates in the future so validation never rejects them.
+      function iso(days){ const d = new Date(); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+      if (!pm.collectionVariables.get('sessionDate'))  pm.collectionVariables.set('sessionDate', iso(30));
+      if (!pm.collectionVariables.get('sessionDate2')) pm.collectionVariables.set('sessionDate2', iso(31));
+    language: text/javascript

@@ -1,0 +1,13 @@
+$kind: http-request
+name: 'Get telescope with malformed id -> 400'
+order: 6000
+method: GET
+url: '{{baseUrl}}/telescopes/not-a-uuid'
+headers:
+  - key: Content-Type
+    value: application/json
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400", function () { pm.response.to.have.status(400); });

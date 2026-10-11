@@ -1,0 +1,23 @@
+$kind: http-request
+name: 'Create telescope'
+order: 1000
+method: POST
+url: '{{baseUrl}}/telescopes'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Dobsonian 8",
+      "aperture_mm": 203,
+      "type": "REFLECTOR"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function () { pm.response.to.have.status(201); });
+      pm.collectionVariables.set("telescopeId", pm.response.json().id);
+      pm.test("Defaults to AVAILABLE", function(){ pm.expect(pm.response.json().status).to.eql("AVAILABLE"); });

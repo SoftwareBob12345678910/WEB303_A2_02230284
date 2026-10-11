@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 
 # =====================================================================
 # Stage 1 - builder: full Go toolchain + protoc. Compiles a static binary.

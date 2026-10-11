@@ -1,0 +1,23 @@
+$kind: http-request
+name: 'Update session (PUT)'
+order: 5000
+method: PUT
+url: '{{baseUrl}}/sessions/{{sessionId}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "telescope_id": "{{telescopeId}}",
+      "observer": "Asha",
+      "date": "{{sessionDate}}",
+      "target": "Jupiter",
+      "status": "BOOKED"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () { pm.response.to.have.status(200); });

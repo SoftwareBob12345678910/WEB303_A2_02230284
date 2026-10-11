@@ -1,0 +1,8 @@
+# Use this workspace to collaborate
+workspace:
+  id: 1026acff-b7b9-467e-8ff5-e2aefeb343fa
+
+localResources:
+  specs:
+    - ../proto/session/v1/session.proto
+    - ../proto/telescope/v1/telescope.proto

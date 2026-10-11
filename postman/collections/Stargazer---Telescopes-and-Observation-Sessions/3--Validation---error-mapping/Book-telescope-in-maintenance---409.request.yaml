@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Book telescope in maintenance -> 409'
+order: 13000
+method: POST
+url: '{{baseUrl}}/sessions'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "telescope_id": "{{maintenanceId}}",
+      "observer": "Asha",
+      "date": "{{sessionDate}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 409", function () { pm.response.to.have.status(409); });

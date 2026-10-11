@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Invalid telescope (bad type) -> 400'
+order: 2000
+method: POST
+url: '{{baseUrl}}/telescopes'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Odd",
+      "aperture_mm": 100,
+      "type": "BINOCULARS"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400", function () { pm.response.to.have.status(400); });

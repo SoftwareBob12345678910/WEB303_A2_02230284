@@ -1,0 +1,13 @@
+$kind: http-request
+name: 'List sessions for one telescope'
+order: 3000
+method: GET
+url: '{{baseUrl}}/sessions?telescope_id={{telescopeId}}'
+headers:
+  - key: Content-Type
+    value: application/json
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () { pm.response.to.have.status(200); });

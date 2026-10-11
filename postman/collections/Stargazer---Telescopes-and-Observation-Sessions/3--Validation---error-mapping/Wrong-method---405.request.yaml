@@ -1,0 +1,10 @@
+$kind: http-request
+name: 'Wrong method -> 405'
+order: 14000
+method: PATCH
+url: '{{baseUrl}}/telescopes'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 405", function () { pm.response.to.have.status(405); });

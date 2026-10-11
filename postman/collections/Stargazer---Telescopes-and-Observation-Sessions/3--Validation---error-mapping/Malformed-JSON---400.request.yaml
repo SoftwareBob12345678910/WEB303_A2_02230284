@@ -1,0 +1,16 @@
+$kind: http-request
+name: 'Malformed JSON -> 400'
+order: 3000
+method: POST
+url: '{{baseUrl}}/telescopes'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: '{"name": "broken",'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400", function () { pm.response.to.have.status(400); });

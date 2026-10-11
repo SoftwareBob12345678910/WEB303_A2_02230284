@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Session in the past -> 400'
+order: 8000
+method: POST
+url: '{{baseUrl}}/sessions'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "telescope_id": "{{telescopeId}}",
+      "observer": "Asha",
+      "date": "2020-01-01"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400", function () { pm.response.to.have.status(400); });

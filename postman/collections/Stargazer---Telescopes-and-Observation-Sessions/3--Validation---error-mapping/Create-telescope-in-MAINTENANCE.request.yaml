@@ -1,0 +1,23 @@
+$kind: http-request
+name: 'Create telescope in MAINTENANCE'
+order: 12000
+method: POST
+url: '{{baseUrl}}/telescopes'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Old Refractor",
+      "aperture_mm": 60,
+      "type": "REFRACTOR",
+      "status": "MAINTENANCE"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function () { pm.response.to.have.status(201); });
+      pm.collectionVariables.set("maintenanceId", pm.response.json().id);

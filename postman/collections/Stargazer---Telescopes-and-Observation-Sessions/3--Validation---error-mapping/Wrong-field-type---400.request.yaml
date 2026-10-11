@@ -1,0 +1,16 @@
+$kind: http-request
+name: 'Wrong field type -> 400'
+order: 4000
+method: POST
+url: '{{baseUrl}}/telescopes'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: '{"name":"X","aperture_mm":"big","type":"REFLECTOR"}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 400", function () { pm.response.to.have.status(400); });

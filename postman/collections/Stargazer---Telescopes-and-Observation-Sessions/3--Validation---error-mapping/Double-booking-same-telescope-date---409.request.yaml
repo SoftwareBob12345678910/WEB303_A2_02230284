@@ -1,0 +1,21 @@
+$kind: http-request
+name: 'Double booking same telescope+date -> 409'
+order: 11000
+method: POST
+url: '{{baseUrl}}/sessions'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "telescope_id": "{{telescopeId}}",
+      "observer": "Ben",
+      "date": "{{sessionDate}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 409", function () { pm.response.to.have.status(409); });
