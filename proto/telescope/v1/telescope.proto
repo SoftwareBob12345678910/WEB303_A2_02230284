@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package telescope.v1;
+
+option go_package = "stargazer/gen/telescope/v1;telescopepb";
+
+// TelescopeService owns the "Telescope" resource (Service B).
+// It is the single source of truth for telescopes; no other service may
+// read its database - they must call this API instead.
+service TelescopeService {
+  rpc CreateTelescope(CreateTelescopeRequest) returns (Telescope);
+  rpc GetTelescope(GetTelescopeRequest) returns (Telescope);
+  rpc ListTelescopes(ListTelescopesRequest) returns (ListTelescopesResponse);
+  rpc UpdateTelescope(UpdateTelescopeRequest) returns (Telescope);
+  rpc DeleteTelescope(DeleteTelescopeRequest) returns (DeleteTelescopeResponse);
+}
+
+message Telescope {
+  string id = 1;
+  string name = 2;
+  int32 aperture_mm = 3;  // light-gathering diameter, 30..1000
+  string type = 4;        // REFRACTOR | REFLECTOR | CATADIOPTRIC
+  string status = 5;      // AVAILABLE | MAINTENANCE
+}
+
+message CreateTelescopeRequest {
+  string name = 1;
+  int32 aperture_mm = 2;
+  string type = 3;
+  string status = 4;      // optional, defaults to AVAILABLE
+}
+
+message GetTelescopeRequest { string id = 1; }
+
+message ListTelescopesRequest {}
+
+message ListTelescopesResponse { repeated Telescope telescopes = 1; }
+
+message UpdateTelescopeRequest {
+  string id = 1;
+  string name = 2;
+  int32 aperture_mm = 3;
+  string type = 4;
+  string status = 5;
+}
+
+message DeleteTelescopeRequest { string id = 1; }
+
+message DeleteTelescopeResponse {}

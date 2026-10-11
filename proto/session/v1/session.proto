@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package session.v1;
+
+option go_package = "stargazer/gen/session/v1;sessionpb";
+
+// SessionService owns the "ObservationSession" resource (Service A).
+// A session books one telescope on one date, so it depends on Service B.
+service SessionService {
+  rpc CreateSession(CreateSessionRequest) returns (Session);
+  rpc GetSession(GetSessionRequest) returns (Session);
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+  rpc UpdateSession(UpdateSessionRequest) returns (Session);
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
+}
+
+message Session {
+  string id = 1;
+  string telescope_id = 2;
+  string observer = 3;
+  string date = 4;        // YYYY-MM-DD
+  string target = 5;      // what will be observed, e.g. "Saturn"
+  string status = 6;      // BOOKED | COMPLETED | CANCELLED
+
+  // Enriched at read time from the Telescope service (never stored here).
+  string telescope_name = 7;
+  // false when the Telescope service could not be reached (fallback mode).
+  bool telescope_details_available = 8;
+}
+
+message CreateSessionRequest {
+  string telescope_id = 1;
+  string observer = 2;
+  string date = 3;
+  string target = 4;
+  string status = 5;      // optional; new sessions are always BOOKED
+}
+
+message GetSessionRequest { string id = 1; }
+
+message ListSessionsRequest {
+  string telescope_id = 1; // optional filter
+}
+
+message ListSessionsResponse { repeated Session sessions = 1; }
+
+message UpdateSessionRequest {
+  string id = 1;
+  string telescope_id = 2;
+  string observer = 3;
+  string date = 4;
+  string target = 5;
+  string status = 6;
+}
+
+message DeleteSessionRequest { string id = 1; }
+
+message DeleteSessionResponse {}

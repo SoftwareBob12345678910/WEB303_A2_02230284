@@ -1,0 +1,5 @@
+*.zip
+*.exe
+.idea/
+.vscode/
+# gen/ is committed on purpose so the repo builds straight after cloning.

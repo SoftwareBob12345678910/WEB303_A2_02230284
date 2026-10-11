@@ -1,0 +1,98 @@
+# Whole system with one command:  docker compose up --build
+# Only the gateway publishes a port; every other container is reachable only
+# on the internal Compose network, which enforces the intended architecture.
+name: stargazer
+
+services:
+  # ---------------- Database A (owned by session-service) ----------------
+  session-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${SESSION_DB_USER}
+      POSTGRES_PASSWORD: ${SESSION_DB_PASSWORD}
+      POSTGRES_DB: ${SESSION_DB_NAME}
+    volumes:
+      - session_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ---------------- Database B (owned by telescope-service) --------------
+  telescope-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${TELESCOPE_DB_USER}
+      POSTGRES_PASSWORD: ${TELESCOPE_DB_PASSWORD}
+      POSTGRES_DB: ${TELESCOPE_DB_NAME}
+    volumes:
+      - telescope_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ---------------- Service B ----------------
+  telescope-service:
+    build:
+      context: .
+      dockerfile: docker/telescope-service.Dockerfile
+    environment:
+      GRPC_PORT: ${TELESCOPE_GRPC_PORT}
+      DB_HOST: telescope-db
+      DB_PORT: "5432"
+      DB_USER: ${TELESCOPE_DB_USER}
+      DB_PASSWORD: ${TELESCOPE_DB_PASSWORD}
+      DB_NAME: ${TELESCOPE_DB_NAME}
+    depends_on:
+      telescope-db:
+        condition: service_healthy
+    restart: unless-stopped   # restarts on crash, but stays stopped after `docker compose stop`
+
+  # ---------------- Service A ----------------
+  session-service:
+    build:
+      context: .
+      dockerfile: docker/session-service.Dockerfile
+    environment:
+      GRPC_PORT: ${SESSION_GRPC_PORT}
+      DB_HOST: session-db
+      DB_PORT: "5432"
+      DB_USER: ${SESSION_DB_USER}
+      DB_PASSWORD: ${SESSION_DB_PASSWORD}
+      DB_NAME: ${SESSION_DB_NAME}
+      TELESCOPE_SERVICE_ADDR: telescope-service:${TELESCOPE_GRPC_PORT}
+      TELESCOPE_TIMEOUT: ${TELESCOPE_TIMEOUT}
+      TELESCOPE_MAX_RETRIES: ${TELESCOPE_MAX_RETRIES}
+      TELESCOPE_RETRY_BACKOFF: ${TELESCOPE_RETRY_BACKOFF}
+      BREAKER_FAILURE_THRESHOLD: ${BREAKER_FAILURE_THRESHOLD}
+      BREAKER_OPEN_DURATION: ${BREAKER_OPEN_DURATION}
+    depends_on:
+      session-db:
+        condition: service_healthy
+      telescope-service:
+        condition: service_started
+    restart: unless-stopped
+
+  # ---------------- API Gateway ----------------
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/gateway.Dockerfile
+    environment:
+      GATEWAY_PORT: ${GATEWAY_PORT}
+      REQUEST_TIMEOUT: ${GATEWAY_REQUEST_TIMEOUT}
+      TELESCOPE_SERVICE_ADDR: telescope-service:${TELESCOPE_GRPC_PORT}
+      SESSION_SERVICE_ADDR: session-service:${SESSION_GRPC_PORT}
+    ports:
+      - "${GATEWAY_PORT}:${GATEWAY_PORT}"
+    depends_on:
+      - telescope-service
+      - session-service
+    restart: unless-stopped
+
+volumes:
+  session_data:
+  telescope_data:
